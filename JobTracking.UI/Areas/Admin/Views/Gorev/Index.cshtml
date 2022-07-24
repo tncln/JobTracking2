@@ -1,0 +1,89 @@
+﻿@model List<GorevListViewModel>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+@if (Model.Count != 0)
+{
+    <a asp-action="EkleGorev" class="btn btn-outline-dark btn-sm my-2"><i class="fa fa-plus-circle mr-2"></i> Yeni Görev</a>
+    <table class="table table-sm table-hover">
+        <tr>
+            <th>Ad</th>
+            <th>Açıklama</th>
+            <th>Oluşturulma Tarih</th>
+            <th>Aciliyet</th>
+            <th>İşlem</th>
+        </tr>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Ad</td>
+                <td>@item.Aciklama</td>
+                <td>@item.OlusturmaTarihi.ToString("D")</td>
+                <td>@item.Aciliyet.Tanim</td>
+                <td>
+                    <a asp-action="GuncelleGorev" asp-route-id="@item.Id" class="btn btn-warning btn-sm"><i class="fa fa-edit mr-2"></i> Düzenle</a>
+                    <a href="" data-bs-toggle="modal" data-bs-target="#silmeEkrani" data-adem="@item.Id" class="btn btn-danger btn-sm"><i class="fa fa-times-circle mr-2"></i> Sil</a>
+                </td>
+            </tr>
+        }
+    </table>
+}
+else
+{
+    <div class="p-3 text-center mt-3">
+        <p class="lead">
+            Herhangi bir görev bulunamadı
+        </p>
+        <a asp-action="EkleGorev" class="btn btn-outline-dark btn-sm my-2"><i class="fa fa-plus-circle mr-2"></i> Yeni Görev</a>
+    </div>
+}
+
+<!-- Modal -->
+<div class="modal fade" id="silmeEkrani" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Uyarı !!</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Silmek İstediğinizden Emin misiniz?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hayır Vazgeç</button>
+                <button id="btnSil" type="button" class="btn btn-primary">Evet Sil</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section JavaScript{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#silmeEkrani").on("show.bs.modal", function (event) {
+                let tetikleyenElement = $(event.relatedTarget);
+                let id = tetikleyenElement.data("adem");
+
+                $("#btnSil").click(function () {
+                    $.ajax({
+                        type: "Get",
+                        url: "./Gorev/SilGorev",
+                        data: { id: id },
+                        dataType: "json",
+                        contentType: "application/json; charset=uf-8;",
+                        success: function () {
+                            //alert("İşlem Tamam");
+                            window.location.reload(); // Sİlme gerçekleşirse sayfayı yenile..
+                        },
+                        error: function (error) {
+                            alert(error.statusText);
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+
+}
